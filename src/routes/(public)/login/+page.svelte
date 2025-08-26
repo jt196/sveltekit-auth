@@ -1,11 +1,10 @@
 <script>
-  export let data;
   let email = '';
   let password = '';
 </script>
 
 <section class="min-h-dvh grid place-items-center p-6">
-  <form method="POST" action="?/login" class="card bg-base-100 w-full max-w-sm shadow-xl">
+  <form method="POST" class="card bg-base-100 w-full max-w-sm shadow-xl">
     <div class="card-body">
       <h2 class="card-title">Sign in</h2>
       <label class="form-control">

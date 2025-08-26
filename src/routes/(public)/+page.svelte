@@ -1,5 +1,5 @@
 <script>
-  export let data;
+  // Svelte 5: no props needed here
 </script>
 
 <section class="min-h-dvh grid place-items-center p-6">
@@ -9,4 +9,3 @@
     <a href="/dashboard" class="btn btn-primary">Go to dashboard</a>
   </div>
 </section>
-

@@ -1,5 +1,5 @@
 <script>
-  export let data;
+  let { data, children } = $props();
 </script>
 
 <div class="min-h-dvh grid grid-rows-[auto_1fr]">
@@ -13,7 +13,7 @@
     </div>
   </header>
   <main class="p-6">
-    <slot />
+    {@render children()}
   </main>
   <footer class="p-4 opacity-60">Protected area</footer>
   </div>
