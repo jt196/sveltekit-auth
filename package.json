@@ -5,8 +5,10 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
+		"dev:logs": "node scripts/run-with-logs.js dev",
 		"build": "vite build",
 		"preview": "vite preview",
+		"preview:logs": "node scripts/run-with-logs.js preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
@@ -19,7 +21,8 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
-		"seed": "node seed.js"
+		"seed": "node seed.js",
+		"logs:clean": "rimraf logs/*.log logs/playwright-* logs/playwright-report || true"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",

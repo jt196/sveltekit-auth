@@ -1,5 +1,7 @@
 // @ts-check
 import { redirect } from '@sveltejs/kit';
+import { appendFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { svelteKitHandler, isAuthPath } from 'better-auth/svelte-kit';
 import { auth, setCurrentRequestEvent } from '$lib/server/auth';
 
@@ -40,4 +42,14 @@ export const handle = async ({ event, resolve }) => {
   }
 
   return resolve(event);
+};
+
+// Centralized error logging (server-only)
+/** @type {import('@sveltejs/kit').HandleServerError} */
+export const handleError = async ({ error, event }) => {
+  const line = `[$${new Date().toISOString()}] ${event.request.method} ${event.url} -> ${error?.message || error}\n`;
+  try {
+    await appendFile(join(process.cwd(), 'logs', 'server-errors.log'), line);
+  } catch {}
+  return { message: 'Internal error' };
 };
