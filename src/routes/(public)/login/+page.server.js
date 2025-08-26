@@ -1,10 +1,13 @@
 // @ts-check
 import { redirect, fail } from '@sveltejs/kit';
 import { auth } from '$lib/server/auth';
+import { env } from '$env/dynamic/private';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ locals }) => {
   if (locals.user) throw redirect(303, '/dashboard');
+  const allowRegister = /^(1|true|yes)$/i.test(env.AUTH_ALLOW_REGISTER || '');
+  return { allowRegister };
 };
 
 /** @type {import('./$types').Actions} */
@@ -15,18 +18,10 @@ export const actions = {
     const password = String(form.get('password') || '').trim();
     if (!email || !password) return fail(400, { error: 'Email and password required' });
 
-    // 1) Try to sign in
     try {
       await auth.api.signInEmail({ headers: request.headers, body: { email, password } });
     } catch (e) {
-      // 2) If sign-in fails, try sign-up then sign-in
-      const name = email.split('@')[0] || 'User';
-      try {
-        await auth.api.signUpEmail({ headers: request.headers, body: { name, email, password } });
-        await auth.api.signInEmail({ headers: request.headers, body: { email, password } });
-      } catch {
-        return fail(400, { error: 'Unable to authenticate' });
-      }
+      return fail(400, { error: 'Invalid email or password' });
     }
 
     // 3) Redirect outside try/catch so we don't capture the redirect exception

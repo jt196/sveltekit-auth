@@ -1,5 +1,5 @@
 <script>
-  let { form } = $props();
+  let { form, data } = $props();
   let email = $state('');
   let password = $state('');
 </script>
@@ -24,7 +24,14 @@
       <div class="card-actions justify-end mt-4">
         <button class="btn btn-primary" type="submit">Continue</button>
       </div>
-      <p class="text-sm opacity-60">Use your demo credentials from .env</p>
+      <div class="mt-2 text-sm flex items-center gap-2">
+        <span class="opacity-60">No account?</span>
+        {#if data?.allowRegister}
+          <a href="/register" class="link link-primary">Register</a>
+        {:else}
+          <span class="opacity-60">Registration disabled</span>
+        {/if}
+      </div>
     </div>
   </form>
 </section>
