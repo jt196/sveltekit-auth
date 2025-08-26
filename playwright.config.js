@@ -6,12 +6,14 @@ export default defineConfig({
 		port: 4173
 	},
 	testDir: 'e2e',
+	globalSetup: './e2e/global-setup.js',
 	reporter: [
 		['list'],
 		['html', { outputFolder: 'logs/playwright-report', open: 'never' }]
 	],
 	outputDir: 'logs/playwright-artifacts',
 	use: {
+		baseURL: 'http://localhost:4173',
 		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure',
 		video: 'retain-on-failure'
