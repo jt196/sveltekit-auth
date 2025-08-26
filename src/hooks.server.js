@@ -1,5 +1,7 @@
 // @ts-check
 import { redirect } from '@sveltejs/kit';
+import { svelteKitHandler, isAuthPath } from 'better-auth/svelte-kit';
+import { auth, setCurrentRequestEvent } from '$lib/server/auth';
 
 /**
  * Dev-only session reader. Replace with Better Auth session lookup.
@@ -18,8 +20,17 @@ function getUserFromCookie(cookies) {
 
 /** @type {import('@sveltejs/kit').Handle} */
 export const handle = async ({ event, resolve }) => {
-  // TODO: swap with Better Auth
-  event.locals.user = getUserFromCookie(event.cookies);
+  // Make request event available to the Better Auth cookie plugin
+  setCurrentRequestEvent(event);
+
+  // Route Better Auth API requests
+  if (isAuthPath(event.url.toString(), auth.options)) {
+    return svelteKitHandler({ auth, event, resolve, building: false });
+  }
+
+  // Resolve Better Auth session
+  const sessionRes = await auth.api.getSession({ headers: event.request.headers });
+  event.locals.user = sessionRes?.user ?? null;
 
   // Protect all routes within the (private) group
   const id = event.route.id ?? '';
@@ -30,4 +41,3 @@ export const handle = async ({ event, resolve }) => {
 
   return resolve(event);
 };
-

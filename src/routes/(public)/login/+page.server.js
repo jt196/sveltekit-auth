@@ -1,5 +1,6 @@
 // @ts-check
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
+import { auth } from '$lib/server/auth';
 
 /** @type {import('./$types').PageServerLoad} */
 export const load = async ({ locals }) => {
@@ -8,21 +9,25 @@ export const load = async ({ locals }) => {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-  login: async ({ request, cookies }) => {
+  login: async ({ request }) => {
     const form = await request.formData();
     const email = String(form.get('email') || '').trim();
-    if (!email) return { success: false };
+    const password = String(form.get('password') || '').trim();
+    if (!email || !password) return fail(400, { error: 'Email and password required' });
 
-    // Dev-only: create a simple session cookie; replace with Better Auth
-    const session = JSON.stringify({ id: crypto.randomUUID(), email });
-    cookies.set('session', session, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: false, // set true in production behind HTTPS
-      maxAge: 60 * 60 * 24 * 7
-    });
-    throw redirect(303, '/dashboard');
+    try {
+      await auth.api.signInEmail({ headers: request.headers, body: { email, password } });
+      throw redirect(303, '/dashboard');
+    } catch {
+      // If sign-in fails, try sign-up then re-sign-in
+      const name = email.split('@')[0] || 'User';
+      try {
+        await auth.api.signUpEmail({ headers: request.headers, body: { name, email, password } });
+        await auth.api.signInEmail({ headers: request.headers, body: { email, password } });
+        throw redirect(303, '/dashboard');
+      } catch (e) {
+        return fail(400, { error: 'Unable to authenticate' });
+      }
+    }
   }
 };
-
