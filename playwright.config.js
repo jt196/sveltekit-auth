@@ -9,7 +9,8 @@ export default defineConfig({
 	globalSetup: './e2e/global-setup.js',
 	reporter: [
 		['list'],
-		['html', { outputFolder: 'logs/playwright-report', open: 'never' }]
+		['html', { outputFolder: 'logs/playwright-report', open: 'never' }],
+		['json', { outputFile: 'logs/playwright-report.json' }]
 	],
 	outputDir: 'logs/playwright-artifacts',
 	use: {

@@ -26,7 +26,9 @@ SvelteKit v2 + Svelte 5 + Tailwind v4 + DaisyUI + Better Auth + Drizzle ORM + SQ
 
 ## Testing
 - Unit: `pnpm run test:unit`
-- E2E (Playwright): `pnpm run test:e2e`
+- E2E (Playwright):
+  - Install browsers (once): `pnpm run browsers:install`
+  - Run tests: `pnpm run test:e2e`
   - Server logs during tests: `logs/preview-*.log`
   - Artifacts: `logs/playwright-artifacts/` (traces, screenshots, videos)
   - HTML report: `logs/playwright-report/`
@@ -38,6 +40,7 @@ SvelteKit v2 + Svelte 5 + Tailwind v4 + DaisyUI + Better Auth + Drizzle ORM + SQ
 
 ## Logging
 - Run with logs: `pnpm run dev:logs` or `pnpm run preview:logs`.
+- Log files are timestamped and ANSI colors are stripped for readability.
 - Server errors append to `logs/server-errors.log`.
 - Clean logs: `pnpm run logs:clean`.
 

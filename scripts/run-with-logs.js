@@ -14,20 +14,31 @@ const ts = new Date()
 const file = join(logsDir, `${mode}-${ts}.log`);
 const out = createWriteStream(file, { flags: 'a' });
 
+const stripAnsi = (s) => s.toString().replace(/\u001b\[[0-9;]*m/g, '');
+const stamp = () => new Date().toISOString();
+const writeLines = (kind, chunk) => {
+  const clean = stripAnsi(chunk);
+  const lines = clean.split(/\r?\n/);
+  for (const line of lines) {
+    if (line.length === 0) continue;
+    out.write(`[${stamp()}] ${kind}: ${line}\n`);
+  }
+};
+
 /** @type {import('node:child_process').SpawnOptions} */
 const opts = { stdio: ['inherit', 'pipe', 'pipe'], shell: true };
-const cmd = mode === 'dev' ? 'vite dev' : 'vite preview';
+const cmd = mode === 'dev' ? 'vite dev --host 127.0.0.1' : 'vite preview --host 127.0.0.1 --port 4173';
 
 console.log(`[run-with-logs] Starting '${cmd}', logging to ${file}`);
 const child = spawn(cmd, [], opts);
 
 child.stdout.on('data', (chunk) => {
   process.stdout.write(chunk);
-  out.write(chunk);
+  writeLines('stdout', chunk);
 });
 child.stderr.on('data', (chunk) => {
   process.stderr.write(chunk);
-  out.write(chunk);
+  writeLines('stderr', chunk);
 });
 
 child.on('close', (code) => {
@@ -35,4 +46,3 @@ child.on('close', (code) => {
   out.end();
   process.exit(code ?? 0);
 });
-

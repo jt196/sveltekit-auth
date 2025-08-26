@@ -31,5 +31,6 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { schema, provider: 'sqlite' }),
   plugins: [sveltekitCookies(() => /** @type {any} */ (currentRequestEvent))],
   secret: AUTH_SECRET,
-  emailAndPassword: { enabled: true, requireEmailVerification: false, autoSignIn: true }
+  emailAndPassword: { enabled: true, requireEmailVerification: false, autoSignIn: true },
+  logger: { level: 'info' }
 });

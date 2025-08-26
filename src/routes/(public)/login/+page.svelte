@@ -1,7 +1,7 @@
 <script>
   let { form } = $props();
-  let email = '';
-  let password = '';
+  let email = $state('');
+  let password = $state('');
 </script>
 
 <section class="min-h-dvh grid place-items-center p-6">
