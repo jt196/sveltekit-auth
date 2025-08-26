@@ -1,25 +1,9 @@
 // @ts-check
 // (console tee disabled to avoid duplicate lines; run-with-logs captures stdout/stderr)
-import { redirect } from '@sveltejs/kit';
 import { appendFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { svelteKitHandler, isAuthPath } from 'better-auth/svelte-kit';
 import { auth, setCurrentRequestEvent } from '$lib/server/auth';
-
-/**
- * Dev-only session reader. Replace with Better Auth session lookup.
- * @param {import('@sveltejs/kit').Cookies} cookies
- */
-function getUserFromCookie(cookies) {
-  const session = cookies.get('session');
-  if (!session) return null;
-  try {
-    const data = JSON.parse(session);
-    return data && typeof data === 'object' && 'id' in data ? /** @type {{id: string, email?: string}} */ (data) : null;
-  } catch {
-    return null;
-  }
-}
 
 /** @type {import('@sveltejs/kit').Handle} */
 export const handle = async ({ event, resolve }) => {
@@ -35,14 +19,7 @@ export const handle = async ({ event, resolve }) => {
   const sessionRes = await auth.api.getSession({ headers: event.request.headers });
   event.locals.user = sessionRes?.user ?? null;
 
-  // Protect all routes within the (private) group
   const id = event.route.id ?? '';
-  const isPrivate = id.includes('(private)');
-  if (isPrivate && !event.locals.user) {
-    // log guard redirect (console only; captured by dev/tests logs)
-    console.log(`[guard] ${event.request.method} ${event.url.pathname} route=${id} -> 303 /login`);
-    throw redirect(303, '/login');
-  }
 
   const started = Date.now();
   const response = await resolve(event);
