@@ -18,7 +18,7 @@ test.describe('Auth flow', () => {
 
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.locator('.alert-error')).toBeVisible();
-    await expect(page.locator('.alert-error')).toContainText('Unable to authenticate');
+    await expect(page.locator('.alert-error')).toContainText('Invalid email or password');
   });
 
   test('accepts valid credentials and redirects to dashboard', async ({ page }) => {
