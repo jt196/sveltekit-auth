@@ -16,14 +16,15 @@
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run && npm run test:e2e",
-		"test:e2e": "playwright test",
+		"test:e2e": "node scripts/run-playwright-with-logs.js",
 		"browsers:install": "playwright install",
 		"db:push": "drizzle-kit push",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
 		"seed": "node seed.js",
-		"logs:clean": "rimraf logs/*.log logs/playwright-* logs/playwright-report || true"
+		"seed:logs": "node scripts/run-seed-with-logs.js",
+		"logs:clean": "sh -c 'rm -f logs/*.log; rm -rf logs/playwright-* logs/playwright-report logs/playwright-artifacts || true'"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",

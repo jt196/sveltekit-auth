@@ -9,7 +9,7 @@
     </div>
     <div class="flex-none gap-2 mr-2">
       <span class="hidden sm:block opacity-70 text-sm">{data?.user?.email}</span>
-      <a class="btn" href="/logout">Logout</a>
+      <a class="btn" href="/logout" data-sveltekit-reload>Logout</a>
     </div>
   </header>
   <main class="p-6">

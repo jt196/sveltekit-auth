@@ -1,4 +1,5 @@
 // @ts-check
+// (console tee disabled to avoid duplicate lines; run-with-logs captures stdout/stderr)
 import { redirect } from '@sveltejs/kit';
 import { appendFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -38,16 +39,24 @@ export const handle = async ({ event, resolve }) => {
   const id = event.route.id ?? '';
   const isPrivate = id.includes('(private)');
   if (isPrivate && !event.locals.user) {
+    // log guard redirect (console only; captured by dev/tests logs)
+    console.log(`[guard] ${event.request.method} ${event.url.pathname} route=${id} -> 303 /login`);
     throw redirect(303, '/login');
   }
 
-  return resolve(event);
+  const started = Date.now();
+  const response = await resolve(event);
+  const ms = Date.now() - started;
+  if (event.url.pathname !== '/__clientlog') {
+    console.log(`[access] ${event.request.method} ${event.url.pathname} route=${id} -> ${response.status} ${ms}ms`);
+  }
+  return response;
 };
 
 // Centralized error logging (server-only)
 /** @type {import('@sveltejs/kit').HandleServerError} */
 export const handleError = async ({ error, event }) => {
-  const line = `[$${new Date().toISOString()}] ${event.request.method} ${event.url} -> ${error?.message || error}\n`;
+  const line = `[${new Date().toISOString()}] ${event.request.method} ${event.url} -> ${error?.message || error}\n`;
   try {
     await appendFile(join(process.cwd(), 'logs', 'server-errors.log'), line);
   } catch {}

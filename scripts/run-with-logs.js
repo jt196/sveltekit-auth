@@ -7,12 +7,10 @@ const mode = process.argv[2] || 'preview'; // 'dev' | 'preview'
 const logsDir = join(process.cwd(), 'logs');
 mkdirSync(logsDir, { recursive: true });
 
-const ts = new Date()
-  .toISOString()
-  .replace(/[:T]/g, '-')
-  .replace(/\..+$/, '');
-const file = join(logsDir, `${mode}-${ts}.log`);
+const file = join(logsDir, mode === 'dev' ? 'dev.log' : 'preview.log');
+// Session header
 const out = createWriteStream(file, { flags: 'a' });
+out.write(`\n=== ${mode.toUpperCase()} START ${new Date().toISOString()} ===\n`);
 
 const stripAnsi = (s) => s.toString().replace(/\u001b\[[0-9;]*m/g, '');
 const stamp = () => new Date().toISOString();
@@ -26,7 +24,11 @@ const writeLines = (kind, chunk) => {
 };
 
 /** @type {import('node:child_process').SpawnOptions} */
-const opts = { stdio: ['inherit', 'pipe', 'pipe'], shell: true };
+const opts = {
+  stdio: ['inherit', 'pipe', 'pipe'],
+  shell: true,
+  env: { ...process.env, APP_LOG_FILE: file }
+};
 const cmd = mode === 'dev' ? 'vite dev --host 127.0.0.1' : 'vite preview --host 127.0.0.1 --port 4173';
 
 console.log(`[run-with-logs] Starting '${cmd}', logging to ${file}`);

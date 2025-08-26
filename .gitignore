@@ -25,6 +25,9 @@ vite.config.ts.timestamp-*
 
 # SQLite
 *.db
+
+# Logs
 logs/*.log
 logs/playwright-*
 logs/playwright-report
+.current-preview-log
